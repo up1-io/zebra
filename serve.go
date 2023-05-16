@@ -14,8 +14,6 @@ func (z *Zebra) ListenAndServe(addr string) error {
 	mux := http.NewServeMux()
 
 	for _, page := range z.Pages {
-		middleware := z.Router.getMiddlewareByURL(page.URL)
-		println(page.URL, middleware)
 		mux.HandleFunc(page.URL, z.withMiddleware())
 	}
 
@@ -50,12 +48,17 @@ func (z *Zebra) withMiddleware() http.HandlerFunc {
 
 		middleware := z.Router.getMiddlewareByURL(p.URL)
 		if middleware != nil {
-			middleware(ctx, func(err error, r Result) {
+			middleware(ctx, func(err error, res Result) {
 				if err != nil {
 					panic(err)
 				}
 
-				result.Data = r.Data
+				if res.Redirect != "" {
+					http.Redirect(w, r, res.Redirect, http.StatusTemporaryRedirect)
+					return
+				}
+
+				result.Data = res.Data
 			})
 		}
 

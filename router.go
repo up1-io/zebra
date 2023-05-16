@@ -12,7 +12,8 @@ type Request struct {
 }
 
 type Result struct {
-	Data map[string]interface{}
+	Redirect string
+	Data     map[string]interface{}
 }
 
 type Callback func(err error, result Result)
