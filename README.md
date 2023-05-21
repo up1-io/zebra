@@ -31,8 +31,6 @@ Here's a simple example to demonstrate how to create a basic Zebra application:
 package main
 
 import (
-	"net/http"
-
 	"github.com/up1-io/zebra"
 )
 
@@ -71,7 +69,7 @@ Folder structure:
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello World</title>
+    <title>Zebra</title>
 </head>
 <body>
     {{ template "content" . }}
