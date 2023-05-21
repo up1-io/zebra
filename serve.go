@@ -100,12 +100,12 @@ func splitURL(url string) []string {
 }
 
 func (z *Zebra) renderTemplate(w http.ResponseWriter, result Result, p *Page) {
-	var componentPaths []string
+	var paths []string
 	for _, component := range p.Components {
-		componentPaths = append(componentPaths, component.TemplatePath)
+		paths = append(paths, component.TemplatePath)
 	}
 
-	paths := append([]string{p.LayoutTemplatePath}, componentPaths...)
+	paths = append([]string{p.LayoutTemplatePath}, paths...)
 	paths = append(paths, p.TemplatePath)
 
 	tmpl, err := template.ParseFiles(paths...)
