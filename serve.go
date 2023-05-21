@@ -5,10 +5,20 @@ import (
 	"github.com/gotailwindcss/tailwind/twembed"
 	"github.com/gotailwindcss/tailwind/twhandler"
 	"html/template"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
 )
+
+const startText = `
+███████╗███████╗██████╗ ██████╗  █████╗ 
+╚══███╔╝██╔════╝██╔══██╗██╔══██╗██╔══██╗
+  ███╔╝ █████╗  ██████╔╝██████╔╝███████║
+ ███╔╝  ██╔══╝  ██╔══██╗██╔══██╗██╔══██║
+███████╗███████╗██████╔╝██║  ██║██║  ██║
+╚══════╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ 
+`
 
 func (z *Zebra) ListenAndServe(addr string) error {
 	mux := http.NewServeMux()
@@ -20,6 +30,9 @@ func (z *Zebra) ListenAndServe(addr string) error {
 	filePath := filepath.Join(z.RootDir, "public")
 	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir(filePath))))
 	mux.Handle("/css/", twhandler.New(http.Dir("public/css"), "/css", twembed.New()))
+
+	println(startText)
+	log.Printf("Starting Zebra server at %s\n", addr)
 
 	return http.ListenAndServe(addr, mux)
 }
