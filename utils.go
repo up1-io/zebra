@@ -22,7 +22,7 @@ func dupCheck(items []string) error {
 }
 
 func removeRootDir(path string) string {
-	return strings.Split(path, "pages/")[1]
+	return strings.Split(path, fmt.Sprintf("%s/", pagesFolderName))[1]
 }
 
 func convertToURL(filePath string) string {

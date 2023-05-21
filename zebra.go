@@ -16,13 +16,6 @@ type Option func(*Zebra)
 
 const defaultRootDir = "."
 
-// WithRootDir sets the root directory of the Zebra instance.
-func WithRootDir(dir string) Option {
-	return func(z *Zebra) {
-		z.RootDir = dir
-	}
-}
-
 // New creates a new Zebra instance. It will load all pages from the pages directory.
 // The pages directory is relative to the root directory.
 func New(opt ...Option) (*Zebra, error) {
@@ -36,7 +29,7 @@ func New(opt ...Option) (*Zebra, error) {
 		o(z)
 	}
 
-	dir := filepath.Join(z.RootDir, "pages")
+	dir := filepath.Join(z.RootDir, pagesFolderName)
 	err := z.loadPagesFromDir(dir)
 	if err != nil {
 		return nil, err

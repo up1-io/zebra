@@ -34,7 +34,7 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 		for _, component := range components {
 			page.Components = append(page.Components, Component{
 				Name:         component,
-				TemplatePath: filepath.Join(z.RootDir, "components", fmt.Sprintf("%s.gohtml", component)),
+				TemplatePath: filepath.Join(z.RootDir, componentsFolderName, fmt.Sprintf("%s.gohtml", component)),
 			})
 		}
 

@@ -5,11 +5,6 @@ import (
 	"strings"
 )
 
-type Component struct {
-	Name         string
-	TemplatePath string
-}
-
 type Page struct {
 	Name               string
 	TemplatePath       string

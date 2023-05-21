@@ -7,7 +7,7 @@ import (
 )
 
 func (z *Zebra) render404(w http.ResponseWriter) {
-	tmpl, err := template.ParseFiles(filepath.Join(z.RootDir, "pages", "_404.gohtml"))
+	tmpl, err := template.ParseFiles(filepath.Join(z.RootDir, pagesFolderName, "_404.gohtml"))
 	if err != nil {
 		z.render500(w)
 		return
