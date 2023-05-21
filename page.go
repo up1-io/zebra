@@ -5,12 +5,18 @@ import (
 	"strings"
 )
 
+type Component struct {
+	Name         string
+	TemplatePath string
+}
+
 type Page struct {
 	Name               string
 	TemplatePath       string
 	URL                string
 	PathVariables      []string
 	LayoutTemplatePath string
+	Components         []Component
 }
 
 func (z *Zebra) GetPageByURL(url string) (Page, error) {

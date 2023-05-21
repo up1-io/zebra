@@ -22,12 +22,45 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 		}
 
 		page.LayoutTemplatePath = layoutTemplatePath
-		z.Pages = append(z.Pages, page)
 
 		// ToDo: find related component
+		components, err := findRequiredComponents(page.TemplatePath)
+		if err != nil {
+			println(err.Error())
+			return err
+		}
+
+		for _, component := range components {
+			page.Components = append(page.Components, Component{
+				Name:         component,
+				TemplatePath: filepath.Join(z.RootDir, "components", fmt.Sprintf("%s.gohtml", component)),
+			})
+		}
+
+		z.Pages = append(z.Pages, page)
 	}
 
 	return nil
+}
+
+func findRequiredComponents(filePath string) ([]string, error) {
+	b, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	components := regexp.MustCompile(`{{\s*template\s*"([a-zA-Z0-9/]+)"\s*}}`).FindAllStringSubmatch(string(b), -1)
+
+	if len(components) == 0 {
+		return []string{}, nil
+	}
+
+	var out []string
+	for _, component := range components {
+		out = append(out, component[1])
+	}
+
+	return out, nil
 }
 
 func parsePathVariables(url string) ([]string, error) {
