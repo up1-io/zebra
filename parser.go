@@ -2,6 +2,7 @@ package zebra
 
 import (
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -49,7 +50,8 @@ func findRequiredComponents(filePath string) ([]string, error) {
 		return nil, err
 	}
 
-	components := regexp.MustCompile(`{{\s*template\s*"([a-zA-Z0-9/]+)"\s*}}`).FindAllStringSubmatch(string(b), -1)
+	components := regexp.MustCompile(`{{\s*template\s*"([a-zA-Z0-9/]+)"\s*[.a-zA-Z0-9]*?\s*}}`).FindAllStringSubmatch(string(b), -1)
+	spew.Dump(components)
 
 	if len(components) == 0 {
 		return []string{}, nil
