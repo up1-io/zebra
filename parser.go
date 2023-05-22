@@ -2,7 +2,6 @@ package zebra
 
 import (
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -18,7 +17,7 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 
 	for _, page := range pages {
 		dir := strings.Replace(page.TemplatePath, page.Name, "", 1)
-		layoutTemplatePath, err := findRelatedLayoutTemplate(dir, &page)
+		layoutTemplatePath, err := findRelatedLayoutTemplate(dir)
 		if err != nil {
 			return err
 		}
@@ -53,7 +52,6 @@ func findRequiredComponents(filePath string) ([]string, error) {
 	}
 
 	components := regexp.MustCompile(`{{\s*template\s*"([a-zA-Z0-9-_/]+)"\s*[.a-zA-Z0-9]*?\s*}}`).FindAllStringSubmatch(string(b), -1)
-	spew.Dump(components)
 
 	if len(components) == 0 {
 		return []string{}, nil
@@ -122,25 +120,33 @@ func isGoHtmlFile(filename string) bool {
 	return strings.HasSuffix(filename, ".gohtml")
 }
 
-func findRelatedLayoutTemplate(path string, page *Page) (string, error) {
-	dir, err := os.ReadDir(path)
+func findRelatedLayoutTemplate(path string) (string, error) {
+	var out string
+	err := filepath.Walk(path, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.Name() == "_layout.gohtml" {
+			out = path
+			return filepath.SkipDir
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return "", fmt.Errorf("failed to read directory: %s", err)
 	}
 
-	for _, file := range dir {
-		if file.Name() == "_layout.gohtml" {
-			return filepath.Join(path, file.Name()), nil
-		}
+	if out != "" {
+		return out, nil
 	}
 
-	if page.LayoutTemplatePath == "" {
-		upDirPath := filepath.Dir(path)
-		if upDirPath == path {
-			return "", fmt.Errorf("template layout not found for %s", page.TemplatePath)
-		}
-		return findRelatedLayoutTemplate(upDirPath, page)
+	parentDirPath := filepath.Dir(path)
+	if parentDirPath == path {
+		return "", fmt.Errorf("template layout not found for %s", path)
 	}
 
-	return "", fmt.Errorf("layout template not found for %s", page.TemplatePath)
+	return findRelatedLayoutTemplate(parentDirPath)
 }
