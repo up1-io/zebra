@@ -4,11 +4,9 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gotailwindcss/tailwind/twembed"
 	"github.com/gotailwindcss/tailwind/twhandler"
-	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
-	"strings"
 )
 
 const startText = `
@@ -76,48 +74,5 @@ func (z *Zebra) withMiddleware() http.HandlerFunc {
 		}
 
 		z.renderTemplate(w, result, &p)
-	}
-}
-
-func (z *Zebra) getPathVars(url string, requestURL string) map[string]string {
-	pathVars := make(map[string]string)
-
-	urlParts := splitURL(url)
-	requestURLParts := splitURL(requestURL)
-
-	for i, part := range urlParts {
-		if strings.HasPrefix(part, "{") {
-			key := part[1 : len(part)-1]
-			pathVars[key] = requestURLParts[i]
-		}
-	}
-
-	return pathVars
-}
-
-func splitURL(url string) []string {
-	return strings.Split(url, "/")
-}
-
-func (z *Zebra) renderTemplate(w http.ResponseWriter, result Result, p *Page) {
-	var paths []string
-	for _, component := range p.Components {
-		paths = append(paths, component.TemplatePath)
-	}
-
-	paths = append([]string{p.LayoutTemplatePath}, paths...)
-	paths = append(paths, p.TemplatePath)
-
-	tmpl, err := template.ParseFiles(paths...)
-	if err != nil {
-		println(err.Error())
-		z.render500(w)
-		return
-	}
-
-	if err := tmpl.Execute(w, result.Data); err != nil {
-		println(err.Error())
-		z.render500(w)
-		return
 	}
 }

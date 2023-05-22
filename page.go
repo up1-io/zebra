@@ -5,13 +5,14 @@ import (
 	"strings"
 )
 
+// Page is a struct that represents a page.
 type Page struct {
 	Name               string
-	TemplatePath       string
 	URL                string
 	PathVariables      []string
-	LayoutTemplatePath string
 	Components         []Component
+	TemplatePath       string
+	LayoutTemplatePath string
 }
 
 func (z *Zebra) GetPageByURL(url string) (Page, error) {

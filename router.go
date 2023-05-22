@@ -1,6 +1,9 @@
 package zebra
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 type Router struct {
 	Middlewares map[string]func(ctx Request, callback Callback)
@@ -8,7 +11,7 @@ type Router struct {
 
 type Request struct {
 	http.Request
-	PathVariables map[string]string
+	PathVariables PathVariables
 }
 
 type Result struct {
@@ -30,4 +33,27 @@ func (r *Router) On(path string, middleware func(r Request, callback Callback)) 
 
 func (r *Router) getMiddlewareByURL(url string) func(r Request, callback Callback) {
 	return r.Middlewares[url]
+}
+
+// PathVariables is a map of path variables
+type PathVariables map[string]string
+
+func (v PathVariables) Get(key string) string {
+	return v[key]
+}
+
+func (z *Zebra) getPathVars(url string, requestURL string) PathVariables {
+	pathVars := make(PathVariables)
+
+	urlParts := strings.Split(url, "/")
+	requestURLParts := strings.Split(requestURL, "/")
+
+	for i, part := range urlParts {
+		if strings.HasPrefix(part, "{") {
+			key := part[1 : len(part)-1]
+			pathVars[key] = requestURLParts[i]
+		}
+	}
+
+	return pathVars
 }

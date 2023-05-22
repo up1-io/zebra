@@ -26,3 +26,26 @@ func (z *Zebra) render500(w http.ResponseWriter) {
 		panic(err)
 	}
 }
+
+func (z *Zebra) renderTemplate(w http.ResponseWriter, result Result, p *Page) {
+	var paths []string
+	for _, component := range p.Components {
+		paths = append(paths, component.TemplatePath)
+	}
+
+	paths = append([]string{p.LayoutTemplatePath}, paths...)
+	paths = append(paths, p.TemplatePath)
+
+	tmpl, err := template.ParseFiles(paths...)
+	if err != nil {
+		println(err.Error())
+		z.render500(w)
+		return
+	}
+
+	if err := tmpl.Execute(w, result.Data); err != nil {
+		println(err.Error())
+		z.render500(w)
+		return
+	}
+}

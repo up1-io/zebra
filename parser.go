@@ -24,13 +24,14 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 
 		page.LayoutTemplatePath = layoutTemplatePath
 
-		// ToDo: find related component
 		components, err := findRequiredComponents(page.TemplatePath)
 		if err != nil {
-			println(err.Error())
 			return err
 		}
 
+		layoutComponents, err := findRequiredComponents(page.LayoutTemplatePath)
+
+		components = append(components, layoutComponents...)
 		for _, component := range components {
 			page.Components = append(page.Components, Component{
 				Name:         component,
@@ -59,6 +60,10 @@ func findRequiredComponents(filePath string) ([]string, error) {
 
 	var out []string
 	for _, component := range components {
+		if component[1] == "content" {
+			continue
+		}
+
 		out = append(out, component[1])
 	}
 
