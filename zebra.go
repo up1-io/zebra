@@ -8,7 +8,7 @@ import (
 type Zebra struct {
 	RootDir string
 	Pages   []Page
-	Router  Router
+	router  Router
 }
 
 // Option is a function that can be passed to New to configure the Zebra instance.
@@ -22,7 +22,7 @@ func New(opt ...Option) (*Zebra, error) {
 	r := NewRouter()
 	z := &Zebra{
 		RootDir: defaultRootDir,
-		Router:  r,
+		router:  r,
 	}
 
 	for _, o := range opt {

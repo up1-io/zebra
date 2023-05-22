@@ -6,18 +6,20 @@ import (
 )
 
 func main() {
+	r := zebra.NewRouter()
+
+	r.On("/about", aboutHandler)
+	r.On("/", homeHandler)
+	r.On("/users/{id}/", userHandler)
+	r.On("/users/{id}/details/{postId}", postHandler)
+	r.On("/test/redirect-test/", redirectHandler)
+
 	app, err := zebra.New()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	app.Router.On("/about", aboutHandler)
-	app.Router.On("/", homeHandler)
-	app.Router.On("/users/{id}/", userHandler)
-	app.Router.On("/users/{id}/details/{postId}", postHandler)
-	app.Router.On("/test/redirect-test/", redirectHandler)
-
-	log.Fatalln(app.ListenAndServe(":8080"))
+	log.Fatalln(app.ListenAndServe(":8080", r))
 }
 
 func aboutHandler(ctx zebra.Request, callback zebra.Callback) {
@@ -35,6 +37,13 @@ func aboutHandler(ctx zebra.Request, callback zebra.Callback) {
 func homeHandler(ctx zebra.Request, callback zebra.Callback) {
 	callback(nil, zebra.Result{
 		Data: map[string]interface{}{
+			"Meta": struct {
+				Title       string
+				Description string
+			}{
+				Title:       "Zebra",
+				Description: "Zebra is a minimalist web framework for Go that focuses on simplicity, performance, and ease of use.",
+			},
 			"Content": struct {
 				Status string
 			}{
@@ -50,7 +59,7 @@ func userHandler(r zebra.Request, callback zebra.Callback) {
 			"Content": struct {
 				Id string
 			}{
-				Id: r.PathVariables["id"],
+				Id: r.PathVariables.Get("id"),
 			},
 		},
 	})

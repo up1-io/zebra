@@ -9,6 +9,7 @@ type Router struct {
 	Middlewares map[string]func(ctx Request, callback Callback)
 }
 
+// Request is a wrapper around http.Request with additional path variables map.
 type Request struct {
 	http.Request
 	PathVariables PathVariables
@@ -42,7 +43,7 @@ func (v PathVariables) Get(key string) string {
 	return v[key]
 }
 
-func (z *Zebra) getPathVars(url string, requestURL string) PathVariables {
+func getPathVars(url string, requestURL string) PathVariables {
 	pathVars := make(PathVariables)
 
 	urlParts := strings.Split(url, "/")

@@ -18,7 +18,9 @@ const startText = `
 ╚══════╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ 
 `
 
-func (z *Zebra) ListenAndServe(addr string) error {
+func (z *Zebra) ListenAndServe(addr string, r Router) error {
+	z.router = r
+
 	mux := http.NewServeMux()
 
 	for _, page := range z.Pages {
@@ -53,11 +55,11 @@ func (z *Zebra) withMiddleware() http.HandlerFunc {
 		}
 
 		if p.PathVariables != nil {
-			ctx.PathVariables = z.getPathVars(p.URL, r.URL.Path)
+			ctx.PathVariables = getPathVars(p.URL, r.URL.Path)
 			spew.Dump(ctx.PathVariables)
 		}
 
-		middleware := z.Router.getMiddlewareByURL(p.URL)
+		middleware := z.router.getMiddlewareByURL(p.URL)
 		if middleware != nil {
 			middleware(ctx, func(err error, res Result) {
 				if err != nil {
