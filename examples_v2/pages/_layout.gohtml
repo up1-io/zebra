@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/css/main.css"/>
+</head>
+<body>
+<header>
+    <p>Site with Go</p>
+    {{ template "menu" }}
+</header>
+{{ template "content" .Content }}
+<footer>
+    <p>
+        Created with <a href="https://golang.org/">Go</a> and <a href="/">Zebra</a>
+    </p>
+</footer>
+</body>
+</html>

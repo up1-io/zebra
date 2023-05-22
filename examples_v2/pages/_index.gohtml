@@ -1,0 +1,14 @@
+{{ define "content" }}
+    <main>
+        <p>Welcome to your new homepage</p>
+        <img src="/public/img.png" alt="img" width="593" height="593"/>
+        <div class="flex space-x-5">
+            <button type="button" class="button p-2 bg-blue-500 rounded">Click me</button>
+            <p class="animate-bounce">Test</p>
+            <button class="test">Test</button>
+            {{ template "status" }}
+            {{ template "status" }}
+            {{ template "status" .Status }}
+        </div>
+    </main>
+{{ end }}

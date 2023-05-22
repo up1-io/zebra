@@ -1,0 +1,27 @@
+{{ define "example" }}
+    <script type="application/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            const counter = document.getElementById("counter");
+            const decrement = document.querySelector("button:first-of-type");
+            const increment = document.querySelector("button:last-of-type");
+
+            decrement.addEventListener("click", function () {
+                counter.innerHTML = parseInt(counter.innerHTML) - 1;
+            });
+
+            increment.addEventListener("click", function () {
+                counter.innerHTML = parseInt(counter.innerHTML) + 1;
+            });
+        });
+    </script>
+
+    <section>
+        <button>
+            Decrement
+        </button>
+        <p>Count: <span id="counter">0</span></p>
+        <button>
+            Increment
+        </button>
+    </section>
+{{ end }}
