@@ -3,6 +3,7 @@ package zebra
 import (
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -80,52 +81,45 @@ func parsePathVariables(url string) ([]string, error) {
 	return pathParams, nil
 }
 
-func parsePageDir(path string) ([]Page, error) {
-	var pages []Page
-
-	files, err := os.ReadDir(path)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read directory: %s", err)
-	}
-
-	for _, file := range files {
-		filePath := filepath.Join(path, file.Name())
-
-		if file.IsDir() {
-			subPagesDir, err := parsePageDir(filePath)
-			if err != nil {
-				return nil, err
-			}
-
-			pages = append(pages, subPagesDir...)
-			continue
+func parsePageDir(path string) (out []Page, err error) {
+	err = filepath.Walk(path, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
 
-		if !strings.HasSuffix(file.Name(), ".gohtml") {
-			continue
+		if info.IsDir() {
+			return nil
 		}
 
-		if file.Name() == "_layout.gohtml" || file.Name() == "_404.gohtml" {
-			continue
+		if !isGoHtmlFile(info.Name()) || isZebraSysFile(info.Name()) {
+			return nil
 		}
 
-		url := convertToURL(filePath)
+		url := convertFilePathToURL(path)
 		pathParams, err := parsePathVariables(url)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		page := Page{
-			Name:          file.Name(),
-			TemplatePath:  filePath,
+		out = append(out, Page{
+			Name:          info.Name(),
+			TemplatePath:  path,
 			URL:           url,
 			PathVariables: pathParams,
-		}
+		})
 
-		pages = append(pages, page)
-	}
+		return nil
+	})
 
-	return pages, nil
+	return out, err
+}
+
+func isZebraSysFile(filename string) bool {
+	return filename == "_layout.gohtml" || filename == "_404.gohtml"
+}
+
+func isGoHtmlFile(filename string) bool {
+	return strings.HasSuffix(filename, ".gohtml")
 }
 
 func findRelatedLayoutTemplate(path string, page *Page) (string, error) {

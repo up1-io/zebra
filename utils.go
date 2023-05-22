@@ -21,15 +21,11 @@ func dupCheck(items []string) error {
 	return nil
 }
 
-func removeRootDir(path string) string {
-	return strings.Split(path, fmt.Sprintf("%s/", pagesFolderName))[1]
-}
-
-func convertToURL(filePath string) string {
-	out := strings.Replace(filePath, ".gohtml", "", 1)
-	out = removeRootDir(out)
-
+func convertFilePathToURL(filepath string) string {
+	out := strings.Replace(filepath, ".gohtml", "", 1)
+	out = strings.Split(out, fmt.Sprintf("%s/", pagesFolderName))[1]
 	out = strings.Replace(out, "_index", "", -1)
+
 	return fmt.Sprintf("/%s", out)
 }
 
