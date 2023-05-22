@@ -5,9 +5,6 @@ import (
 	"log"
 )
 
-// ToDo: reduce tailwindcss size
-// ToDo: add component support
-
 func main() {
 	app, err := zebra.New()
 	if err != nil {
