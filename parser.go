@@ -24,20 +24,18 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 
 		page.LayoutTemplatePath = layoutTemplatePath
 
-		components, err := findRequiredComponents(page.TemplatePath)
+		templateComponents, err := z.findRequiredComponents(page.TemplatePath)
 		if err != nil {
 			return err
 		}
 
-		layoutComponents, err := findRequiredComponents(page.LayoutTemplatePath)
-
-		components = append(components, layoutComponents...)
-		for _, component := range components {
-			page.Components = append(page.Components, Component{
-				Name:         component,
-				TemplatePath: filepath.Join(z.RootDir, componentsFolderName, fmt.Sprintf("%s.gohtml", component)),
-			})
+		layoutComponents, err := z.findRequiredComponents(page.LayoutTemplatePath)
+		if err != nil {
+			return err
 		}
+
+		// ToDo: Check if component has subcomponents and search for circular dependencies
+		page.Components = append(templateComponents, layoutComponents...)
 
 		z.Pages = append(z.Pages, page)
 	}
@@ -45,23 +43,28 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 	return nil
 }
 
-func findRequiredComponents(filepath string) ([]string, error) {
-	b, err := os.ReadFile(filepath)
+func (z *Zebra) findRequiredComponents(path string) ([]Component, error) {
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
 	regex := regexp.MustCompile(`{{\s*template\s*"([a-zA-Z0-9-_/]+)"\s*[.a-zA-Z0-9]*?\s*}}`)
-	components := regex.FindAllStringSubmatch(string(b), -1)
+	allStringSubmatch := regex.FindAllStringSubmatch(string(b), -1)
 
-	var out []string
-	for _, component := range components {
+	var out []Component
+	for _, submatch := range allStringSubmatch {
+		name := submatch[1]
+
 		// Skip content template definition
-		if component[1] == "content" {
+		if name == "content" {
 			continue
 		}
 
-		out = append(out, component[1])
+		out = append(out, Component{
+			Name:         name,
+			TemplatePath: filepath.Join(z.RootDir, componentsFolderName, fmt.Sprintf("%s.gohtml", name)),
+		})
 	}
 
 	return out, nil
