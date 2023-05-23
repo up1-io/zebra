@@ -45,23 +45,23 @@ func (z *Zebra) withMiddleware() http.HandlerFunc {
 			return
 		}
 
-		ctx := Request{
+		req := Request{
 			Request:       *r,
 			PathVariables: make(map[string]string),
 		}
 
-		result := Result{
+		res := Result{
 			Data: make(map[string]interface{}),
 		}
 
 		if p.PathVariables != nil {
-			ctx.PathVariables = getPathVars(p.URL, r.URL.Path)
-			spew.Dump(ctx.PathVariables)
+			req.PathVariables = getPathVars(p.URL, r.URL.Path)
+			spew.Dump(req.PathVariables)
 		}
 
 		middleware := z.router.getMiddlewareByURL(p.URL)
 		if middleware != nil {
-			middleware(ctx, func(err error, res Result) {
+			middleware(req, func(err error, res Result) {
 				if err != nil {
 					panic(err)
 				}
@@ -71,10 +71,10 @@ func (z *Zebra) withMiddleware() http.HandlerFunc {
 					return
 				}
 
-				result.Data = res.Data
+				res.Data = res.Data
 			})
 		}
 
-		z.renderTemplate(w, result, &p)
+		z.renderTemplate(w, res, &p)
 	}
 }
