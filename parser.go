@@ -16,7 +16,7 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 	}
 
 	for _, page := range pages {
-		dir := strings.Replace(page.TemplatePath, page.Name, "", 1)
+		dir := filepath.Dir(page.TemplatePath)
 		layoutTemplatePath, err := findRelatedLayoutTemplate(dir)
 		if err != nil {
 			return err
@@ -45,20 +45,18 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 	return nil
 }
 
-func findRequiredComponents(filePath string) ([]string, error) {
-	b, err := os.ReadFile(filePath)
+func findRequiredComponents(filepath string) ([]string, error) {
+	b, err := os.ReadFile(filepath)
 	if err != nil {
 		return nil, err
 	}
 
-	components := regexp.MustCompile(`{{\s*template\s*"([a-zA-Z0-9-_/]+)"\s*[.a-zA-Z0-9]*?\s*}}`).FindAllStringSubmatch(string(b), -1)
-
-	if len(components) == 0 {
-		return []string{}, nil
-	}
+	regex := regexp.MustCompile(`{{\s*template\s*"([a-zA-Z0-9-_/]+)"\s*[.a-zA-Z0-9]*?\s*}}`)
+	components := regex.FindAllStringSubmatch(string(b), -1)
 
 	var out []string
 	for _, component := range components {
+		// Skip content template definition
 		if component[1] == "content" {
 			continue
 		}
