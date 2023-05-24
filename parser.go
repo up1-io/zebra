@@ -34,7 +34,7 @@ func (z *Zebra) loadPagesFromDir(path string) error {
 			return err
 		}
 
-		// ToDo: Check if component has subcomponents and search for circular dependencies
+		// ToDo: Check if component has subcomponents and search for circular dependencies. Add Behavior for duplicate components.
 		page.Components = append(templateComponents, layoutComponents...)
 
 		z.Pages = append(z.Pages, page)

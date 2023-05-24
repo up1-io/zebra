@@ -18,6 +18,22 @@ const startText = `
 ╚══════╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ 
 `
 
+func (z *Zebra) ServeMux(r Router) *http.ServeMux {
+	z.router = r
+
+	mux := http.NewServeMux()
+
+	for _, page := range z.Pages {
+		mux.HandleFunc(page.URL, z.withMiddleware())
+	}
+
+	filePath := filepath.Join(z.RootDir, "public")
+	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir(filePath))))
+	mux.Handle("/css/", twhandler.New(http.Dir("public/css"), "/css", twembed.New()))
+
+	return mux
+}
+
 func (z *Zebra) ListenAndServe(addr string, r Router) error {
 	z.router = r
 
