@@ -2,8 +2,6 @@ package zebra
 
 import (
 	"github.com/davecgh/go-spew/spew"
-	"github.com/gotailwindcss/tailwind/twembed"
-	"github.com/gotailwindcss/tailwind/twhandler"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -29,7 +27,6 @@ func (z *Zebra) ServeMux(r Router) *http.ServeMux {
 
 	filePath := filepath.Join(z.RootDir, "public")
 	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir(filePath))))
-	mux.Handle("/css/", twhandler.New(http.Dir("public/css"), "/css", twembed.New()))
 
 	return mux
 }
@@ -45,7 +42,6 @@ func (z *Zebra) ListenAndServe(addr string, r Router) error {
 
 	filePath := filepath.Join(z.RootDir, "public")
 	mux.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir(filePath))))
-	mux.Handle("/css/", twhandler.New(http.Dir("public/css"), "/css", twembed.New()))
 
 	println(startText)
 	log.Printf("Starting Zebra server at %s\n", addr)
