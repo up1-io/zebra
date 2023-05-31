@@ -62,7 +62,7 @@ func (z *Zebra) withMiddleware() http.HandlerFunc {
 			PathVariables: make(map[string]string),
 		}
 
-		res := Result{
+		result := Result{
 			Data: make(map[string]interface{}),
 		}
 
@@ -83,10 +83,10 @@ func (z *Zebra) withMiddleware() http.HandlerFunc {
 					return
 				}
 
-				res.Data = res.Data
+				result.Data = res.Data
 			})
 		}
 
-		z.renderTemplate(w, res, &p)
+		z.renderTemplate(w, result, &p)
 	}
 }
